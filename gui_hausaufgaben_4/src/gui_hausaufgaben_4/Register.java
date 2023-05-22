@@ -10,18 +10,25 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.stream.Stream;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public class Register extends JFrame implements ActionListener{
-	private String path = "C:\\Users\\kerem.aydın\\git\\repository\\gui_hausaufgaben_4\\src\\gui_hausaufgaben_4\\users";
+	private static String path = "C:\\Users\\kerem.aydın\\git\\repository\\gui_hausaufgaben_4\\src\\gui_hausaufgaben_4\\users";
 	private JButton btnRegister;
 	private JLabel lblId, lblPassword;
-	private JTextField id, password;
+	private static JTextField id;
+	private JTextField password;
 	private JPanel pnlCenter, pnlBottom;
 	
 	public Register() {
@@ -59,7 +66,7 @@ public class Register extends JFrame implements ActionListener{
 		setLocationRelativeTo(null);
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		new Register();
 
 	}
@@ -69,24 +76,36 @@ public class Register extends JFrame implements ActionListener{
 		if(id.getText().equals("") != true && password.getText().equals("") != true) {
 			File file = new File(path);
 			try {
-				FileReader fReader = new FileReader(file);
-				BufferedReader bReader = new BufferedReader(fReader);
-				String line = "";
-				while((line = bReader.readLine()) != null) { //file komple boşsa hiç çalışmıyor buna çözüm lazım
-					String[] user = line.split("\t");
-					if(id.getText().equals(user[0]) == false) {
-						FileWriter fWriter = new FileWriter(file,true);
-						BufferedWriter bWriter = new BufferedWriter(fWriter);
-						bWriter.write(id.getText()+"\t"+password.getText()+"\t"+0+"\n");
-						bWriter.close();
-						break;
-					}
+				if(checkUser() == true) {
+					FileWriter fWriter = new FileWriter(file,true);
+					BufferedWriter bWriter = new BufferedWriter(fWriter);
+					bWriter.write(id.getText()+"\t"+password.getText()+"\t"+0+"\n");
+					bWriter.close();
+				} else {
+					JOptionPane.showMessageDialog(null, "Username defined!", "Error", JOptionPane.ERROR_MESSAGE);
 				}
-				bReader.close();
 			} catch (IOException e1) {
-				System.out.println(e1.getMessage());
+				e1.printStackTrace();
 			}
 		}
+	}
+	
+	public static boolean checkUser() throws IOException {
+		File file = new File(path);
+		FileReader fReader = new FileReader(file);
+		BufferedReader bReader = new BufferedReader(fReader);
+		long lineCount;
+		Stream<String> stream = Files.lines(Paths.get(path));
+		lineCount = stream.count();
+		while(lineCount>0) {
+			String[] user = bReader.readLine().split("\t");
+			if(id.getText().equals(user[0]) == true) {
+				System.out.println("Username defined");
+				return false;
+			}
+			lineCount--;
+		}
+		return true;
 	}
 
 }
