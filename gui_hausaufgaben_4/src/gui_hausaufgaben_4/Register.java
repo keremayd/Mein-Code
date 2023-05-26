@@ -79,7 +79,7 @@ public class Register extends JFrame implements ActionListener{
 				if(checkUser() == true) {
 					FileWriter fWriter = new FileWriter(file,true);
 					BufferedWriter bWriter = new BufferedWriter(fWriter);
-					bWriter.write(id.getText()+"\t"+password.getText()+"\t"+0+"\n");
+					bWriter.write(id.getText()+"\t"+password.getText()+"\t"+0+"\t"+false+"\n");
 					bWriter.close();
 				} else {
 					JOptionPane.showMessageDialog(null, "Username defined!", "Error", JOptionPane.ERROR_MESSAGE);
